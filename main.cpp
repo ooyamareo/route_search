@@ -11,15 +11,19 @@
 std::map<std::string,int> station_to_index; //駅に番号をつける
 std::vector<std::string>  index_to_station; //上のmapの逆写像
 
+std::map<std::string,int> line_to_index; //路線に番号をつける
+std::vector<std::string>  index_to_line; //上のmapの逆写像
+
+
 //station.csvを読んで駅に番号を付ける
 
 
 class Edge{
-    int to;
-    int line;
+    int to_index;
+    int line_index;
     int time;
     int fare;
-    Edge(int to,int line,int time,int fare):to(to),line(line),time(time),fare(fare) {}
+    Edge(int to_index,int line_index,int time,int fare):to_index(to_index),line_index(line_index),time(time),fare(fare) {}
 };
 
 
@@ -90,18 +94,31 @@ void read_connection_csv(){
         //str_bufをコンマ区切りで読む
         
 
-        int vertex,next_vertex,line,time,fare;
-        std::vector<int*> address={&vertex,&next_vertex,&line,&time,&fare};
+        int current_staiton_index,next_station_index,line_index,time,fare;
 
-        for(int i = 0;i < 5; i++){
 
-            getline(str_buf_stream,str_comma_buf){
+        std::vector<int*> address={&current_staiton_index,&next_station_index,&line_index,&time,&fare};
+        for(int i = 0; i < 5 ; i++){
+            getline(str_buf_stream,str_comma_buf,',');
+            if (i <= 1){
+                std::string station=str_comma_buf;
 
-                if(i <= 2)*address[i]=st
+                if(!station_to_index.count(str_comma_buf)){
+                    station_to_index[str_comma_buf]=index_to_station.size();
+                    index_to_station.push_back(str_comma_buf);
+                }
+
+
+                *address[i]=station_to_index[str_comma_buf];
+            }
+            else if( i == 2){
+                //std::string station=str_comma_buf;
+            }
+            else{
 
             }
-
         }
+       
 
 
 
@@ -117,6 +134,7 @@ void read_connection_csv(){
 
 int main(){
 
+    
     read_station_csv();
 
     read_connection_csv();
