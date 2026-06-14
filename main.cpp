@@ -17,7 +17,7 @@ std::vector<std::string>  index_to_station; //上のmapの逆写像
 std::map<std::string,int> line_to_index; //路線に番号をつける
 std::vector<std::string>  index_to_line; //上のmapの逆写像
 
-template<class T>inline void swap(T a,T b){
+template<class T>inline void swap(T &a,T &b){
     T c=a;
     a=b;
     b=c;
@@ -32,17 +32,17 @@ class Edge{
     int from_index;
     int to_index;
     int line_index;
-    int time;
     int fare;
+    int time;
     
 
 
-    Edge(int from_index,int to_index,int line_index,int time,int fare):
+    Edge(int from_index,int to_index,int line_index,int fare,int time):
     from_index(from_index),
     to_index(to_index),
     line_index(line_index),
-    time(time),
-    fare(fare) 
+    fare(fare),
+    time(time) 
     {}
 };
 
@@ -50,49 +50,11 @@ class Edge{
 
 std::vector<std::vector<Edge>> graph;
 
-/*
-void read_station_csv(){
-    std::string str_buf;
-    std::ifstream ifs_station("~/route/station.csv");
 
-    if(!ifs_station){
-        std::cout <<"csvファイルが開けません\n";
-        exit(0);
-    }
-
-    getline(ifs_station,str_buf);
-    if(str_buf!="name"){
-        std::cout <<"ファイル名，またはファイルの中身が誤っています\n";
-        exit(0);
-    }
-
-    int index=0;
-
-
-    while(getline(ifs_station,str_buf)){
-
-
-        station_to_index[str_buf]=index;
-
-        index_to_station.push_back(str_buf);
-
-        index++;
-
-        
-    }
-    
-    graph.resize(index);
-
-    return;
-
-
-}
-
-//*/
 
 void read_connection_csv(){
     std::string str_buf;
-    std::ifstream ifs_station("/home/yourname/connection.csv");
+    std::ifstream ifs_station("/home/delta2197/route/connection.csv");
 
     if(!ifs_station){
         std::cout <<"csvファイルが開けません\n";
@@ -100,7 +62,7 @@ void read_connection_csv(){
     }
 
     getline(ifs_station,str_buf);
-    if(str_buf!="from,to,line,time,fare"){
+    if(str_buf!="from,to,line,fare,time"){
         std::cout <<"ファイル名，またはファイルの中身が誤っています\n";
         exit(1);
     }
@@ -116,10 +78,10 @@ void read_connection_csv(){
         //str_bufをコンマ区切りで読む
         
 
-        int current_station_index,next_station_index,line_index,time,fare;
+        int current_station_index,next_station_index,line_index,fare,time;
 
 
-        std::vector<int*> address={&current_station_index,&next_station_index,&line_index,&time,&fare};
+        std::vector<int*> address={&current_station_index,&next_station_index,&line_index,&fare,&time};
         for(int i = 0; i < 5 ; i++){
             getline(str_buf_stream,str_comma_buf,',');
 
@@ -143,13 +105,13 @@ void read_connection_csv(){
                 if(!line_to_index.count(str_comma_buf)){
                     line_to_index[str_comma_buf]=index_to_line.size();
                     index_to_line.push_back(str_comma_buf);
-                }
+                }std::string response;
                 //路線のインデックスを保存
                 *address[i]=line_to_index[str_comma_buf];
 
             }
             else{
-
+                //std::cout <<str_comma_buf<<' ';
                 //運賃，または経由時間を保存
                 *address[i]=std::stoi(str_comma_buf);
 
@@ -160,14 +122,14 @@ void read_connection_csv(){
         graph[current_station_index].push_back(Edge{current_station_index,
                                                     next_station_index,
                                                     line_index,
-                                                    time,
-                                                    fare                });
+                                                    fare,
+                                                    time                });
 
         graph[next_station_index   ].push_back(Edge{next_station_index,
                                                     current_station_index,
                                                     line_index,
-                                                    time,
-                                                    fare});
+                                                    fare,
+                                                    time});
        
 
 
@@ -184,7 +146,7 @@ void read_connection_csv(){
 
 
 //最短経路（または最安値の経路）をダイクストラ法で求めて，stack<Edge>で経路復元 
-//memberはfareとtimeのどちらかを入れることを想定
+//memberはtimeとfareのどちらかを入れることを想定
 std::stack<Edge> dijkstra(int start_index,int goal_index,int Edge::* member){
 
     const int N=index_to_station.size();
@@ -218,6 +180,10 @@ std::stack<Edge> dijkstra(int start_index,int goal_index,int Edge::* member){
     //route_Edge:経路上の辺のstack この関数の返り値
     std::stack<Edge> route_Edge;
 
+    //See "route_Edgeのstackで最後に空の辺を追加"
+    route_Edge.push(Edge{goal_index,-1,-1,-1,-1});
+
+
     while(route_station.top()!=start_index){
         for(auto edge:graph[route_station.top()]){
             if(dist[edge.to_index]+edge.*member==dist[route_station.top()]){
@@ -235,14 +201,16 @@ std::stack<Edge> dijkstra(int start_index,int goal_index,int Edge::* member){
 }
 
 
-
+using std::cout;
 
 int main(){
 
     
-    //read_station_csv();
+    
 
     read_connection_csv();
+    
+
 
     while(true){
 
@@ -262,8 +230,10 @@ int main(){
             
             if (!getline(std::cin,cmd) || cmd=="exit")return 0; 
             
-            if (station_to_index.count(cmd)==false) abort();
-            
+            if (station_to_index.count(cmd)==false) {
+                std::cout <<cmd<<"\n";
+                return 0;
+            }
 
             switch(i){
                 case 0: start_index=station_to_index[cmd];
@@ -272,32 +242,86 @@ int main(){
                         break;
             }
         }
+        std::cout <<"\n";
         
+        
+        std::array member_array={&Edge::fare,&Edge::time};
 
-        std::array member_array={&Edge::time,&Edge::fare};
+        
         for(int i = 0; i < 2; i++){
-            if(i == 0)std::cout <<"最短経路\n";
-            if(i == 1)std::cout <<"最低運賃経路\n";
+            int total_fare=0,total_time=0;
+            std::string response;
             
             auto member=member_array[i];
-
+            
+            
             std::stack<Edge> route_Edge=dijkstra(start_index,goal_index,member);
+
+            
+            int continous_line_index=route_Edge.top().line_index;
+            int continous_sum_fare=0,continous_sum_time=0;
+            
+            response+=index_to_station[start_index]+"\n";
+          
+            
+            /*
+            "route_Edgeのstackで最後に空の辺を追加"
+            以下のwhile文では連続した部分の路線(continous_line_index)を保存し，それがroute_Edge.top()と異なるとき
+            responseに路線，運賃，時間を追加する構図
+            最後の空の辺を追加しなければ，経路の最後の路線が復元されないため，空の辺を追加した．
+            */
+
             while(!route_Edge.empty()){
+                
                 Edge edge=route_Edge.top();
                 route_Edge.pop();
-                std::cout <<index_to_station[edge.from_index] <<std::endl;
+                
+                if(continous_line_index != edge.line_index){
+                    
+                    
+                    
 
-                std::cout <<"| "<<index_to_line[edge.line_index] <<"\n";
-                std::cout <<"| "<<edge.*member <<"\n";
 
+                    //路線名
+                    response+="|\n|--"+index_to_line[continous_line_index]+"(";
+                    continous_line_index=edge.line_index;
+
+                    //運賃
+                    response+=std::to_string(continous_sum_fare)+"円"+",";
+                    total_fare+=continous_sum_fare;
+                    continous_sum_fare=0;
+                    
+                    //時間
+                    response+=std::to_string(continous_sum_time)+"分)\n|\n";
+                    total_time+=continous_sum_time;
+                    continous_sum_time=0;
+
+                    //経由駅名
+                    response+=  index_to_station[edge.from_index]+"\n";
+                   
+                    
+
+                }
+                continous_sum_fare+=edge.fare;
+                continous_sum_time+=edge.time;
+                
+            
 
             }
-
-            std::cout <<index_to_station[goal_index]<<std::endl;
             
+
+            cout <<"\n";
+            
+
+
+            if(i == 0)printf("最低運賃経路(%d円,%d分)\n",total_fare,total_time);
+            if(i == 1)printf("最短経路(%d円,%d分)\n",    total_fare,total_time);
+
+            std::cout <<response<<"\n";
+
         }
         
-        return 0; 
+        
 
 
     }
