@@ -15,7 +15,7 @@ void RailwayNetwork::read_connection_csv(){
 
 
     std::string str_buf;
-    std::ifstream ifs_station("/home/delta2197/route/data/connection.csv");
+    std::ifstream ifs_station("data/connection.csv");
 
     if(!ifs_station){
         std::cout <<"csvファイルが開けません\n";

@@ -10,7 +10,11 @@ makeでコンパイルして./testで実行する．
 二つの駅の一方が存在しなかったり，たどり着く方法がなかったりする場合はその旨を出力で伝えて入力をやり直す
 任意の入力で"exit"またはctrl+Cでプログラム終了
 
-connection.csvは1行目はfrom,to,line,fare,timeで，二行目に駅の間の賃金，運賃，
+connection.csvは一行目はfrom,to,line,fare,timeで二行目以降には路線図の駅間の路線，運賃，移動時間を羅列する
+
+git clone ...
+cd route
+./src/main
 
 ## 注意
 プログラム実行中の駅名の入力は空白や改行を含んではならない
