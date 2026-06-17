@@ -210,3 +210,78 @@ void RailwayNetwork::station_plan_input(int &start_index,int &goal_index,int &pl
         
 
 }
+
+//dijkstra()で得た経路を出力する関数
+void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan){
+    
+    
+    std::cout <<"\n";
+    
+    
+    
+    //最低運賃経路の場合はfareで,最短経路の場合はtimeで探索するようにする
+    
+    
+    int total_fare=0,total_time=0;
+
+    
+    
+    //経路を文字列responseで出力する
+    std::string response=index_to_station[start_index]+"\n";
+    
+    
+    /*
+    "route_Railのstackで最後に空の辺を追加"
+    以下のwhile文では連続した部分の路線(continous_line_index)を保存し，
+    それがroute_Rail.top().line_indexと異なるときに，responseに路線，運賃，時間を追加する
+    最後の空の辺を追加しなければ，経路の最後の路線が復元されないため，空の辺を追加した．
+    */
+
+    while(route_Rail.top().line_index!=-1){
+        
+        Rail rail=route_Rail.top();
+        route_Rail.pop();
+        
+
+
+        //路線名
+        response+="|\n|--"+index_to_line[rail.line_index]+"(";
+        rail.line_index=rail.line_index;
+
+        //運賃
+        response+=std::to_string(rail.fare)+"円"+",";
+        total_fare+=rail.fare;
+        rail.fare=0;
+        
+        //時間
+        response+=std::to_string(rail.time)+"分)\n|\n";
+        total_time+=rail.time;
+        rail.time=0;
+
+        //経由駅名
+        response+=  index_to_station[rail.to_index]+"\n";
+            //std::cout <<rail.to_index<<index_to_station[rail.to_index]<<"\n";
+            
+
+        
+        rail.fare+=rail.fare;
+        rail.time+=rail.time;
+        
+    
+
+    }
+    
+
+    std::cout <<"\n";
+    
+
+
+    if(plan == 0)printf("最低運賃経路(%d円,%d分)\n",total_fare,total_time);
+    if(plan == 1)printf("最短経路(%d円,%d分)\n",    total_fare,total_time);
+
+    std::cout <<response<<"\n";
+
+    
+        
+}
+
