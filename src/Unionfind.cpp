@@ -1,6 +1,6 @@
 #include<vector>
 
-#include "/home/delta2197/route/include/Unionfind.hpp"
+#include "Unionfind.hpp"
 
 Unionfind::Unionfind(int n):N(n){
     par.resize(N);
