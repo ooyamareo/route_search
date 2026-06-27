@@ -1,35 +1,8 @@
-#include<vector>
-#include<map>
-#include<queue>
 #include<stack>
-#include<array>
-
-#include<iostream>
-#include<string>
-#include <fstream>
-#include <sstream>
-#include<algorithm>
-
-
-
 
 #include "global_val.hpp"
 #include "Unionfind.hpp"
-
 #include "RailwayNetwork.hpp"
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -39,12 +12,6 @@
 
 
 
-
-
-
-
-
-using std::cout;
 
 int main(){
     RailwayNetwork network;
@@ -57,7 +24,6 @@ int main(){
 
         int start_index,goal_index;
 
-        bool start_is_connected_to_goal=true;
         int plan=-1;
 
         network.station_plan_input(start_index,goal_index,plan);
@@ -65,20 +31,20 @@ int main(){
         
         
         int fare_ratio,time_ratio;
-        if(start_is_connected_to_goal == true){
-            switch (plan)
-            {
-            case 0: //最短経路
-                fare_ratio=1,time_ratio=0;
-                break;
-            
-            case 1:
-                fare_ratio=0,time_ratio=1;
-            }
+        
+        switch (plan)
+        {
+        case 0: //最安運賃経路
+            fare_ratio=1,time_ratio=0;
+            break;
+        
+        case 1: //最短経路
+            fare_ratio=0,time_ratio=1;
         }
-        network.dijkstra(start_index,goal_index,fare_ratio,time_ratio);
+        
+        std::stack<Rail> route_Rail=network.dijkstra(start_index,goal_index,fare_ratio,time_ratio);
 
-        network.route_output(start_index,goal_index,plan);
+        network.route_output(start_index,goal_index,plan,route_Rail);
     }
 
     

@@ -33,11 +33,10 @@ void RailwayNetwork::read_connection_csv(){
     
     
     std::string pre_str_buf=str_buf;
-    while(true){
+    while(ifs_station>>str_buf){
     
     //while(getline(ifs_station,str_buf)){
-        ifs_station>>str_buf;if(str_buf==pre_str_buf)break;
-        pre_str_buf=str_buf;
+        
         //cout <<str_buf<<"\n";
         std::string str_comma_buf;
         std::istringstream str_buf_stream(str_buf);
@@ -212,7 +211,7 @@ void RailwayNetwork::station_plan_input(int &start_index,int &goal_index,int &pl
 }
 
 //dijkstra()で得た経路を出力する関数
-void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan){
+void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan,std::stack<Rail> &route_Rail){
     
     
     std::cout <<"\n";
@@ -236,13 +235,13 @@ void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan){
     それがroute_Rail.top().line_indexと異なるときに，responseに路線，運賃，時間を追加する
     最後の空の辺を追加しなければ，経路の最後の路線が復元されないため，空の辺を追加した．
     */
+    
 
     while(route_Rail.top().line_index!=-1){
         
         Rail rail=route_Rail.top();
         route_Rail.pop();
         
-
 
         //路線名
         response+="|\n|--"+index_to_line[rail.line_index]+"(";
@@ -264,8 +263,6 @@ void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan){
             
 
         
-        rail.fare+=rail.fare;
-        rail.time+=rail.time;
         
     
 

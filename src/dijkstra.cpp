@@ -31,15 +31,20 @@ std::stack<Rail> RailwayNetwork::dijkstra(int start_index,int goal_index,
         node(int v=0,int d=0):vertex(v),distance(d) {}
     };  
 
+
+
     std::priority_queue<node,std::vector<node>,std::greater<node>> pq;
     dist[start_index]=0;
     pq.push(node{start_index,(int)0});
 
     while(!pq.empty()){
         int from_index=pq.top().vertex;
+
+        int now_distance=pq.top().distance;
+        
         pq.pop();
 
-        if(dist[pq.top().vertex]!=INT_MAX/2 && dist[pq.top().vertex]<pq.top().distance)continue;
+        if(dist[from_index]<now_distance)continue;
 
         for(auto rail:graph[from_index]){
             
@@ -51,9 +56,10 @@ std::stack<Rail> RailwayNetwork::dijkstra(int start_index,int goal_index,
         }
     }
 
-    //goalまでたどり着けない場合は考えないものとする
+    //Unionfindでgoalにたどり着けない場合を処理済みなので，
+    //もしたどり着けないならバグがある
     if(dist[goal_index]==INT_MAX/2){
-        std::cout <<"sin\n";
+        std::cout <<"dijkstra法にエラーの可能性あり\n";
         abort();
     }
 

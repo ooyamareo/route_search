@@ -3,6 +3,7 @@
 
 
 #include <map>
+#include<unordered_map>
 #include <string>
 #include <vector>
 #include <stack>
@@ -11,8 +12,7 @@
 
 
 
-class Rail{
-    public:
+struct Rail{
     int from_index;
     int to_index;
     int line_index;
@@ -22,16 +22,15 @@ class Rail{
 };
 
 struct RailwayNetwork{
-    std::map<std::string,int> station_to_index;
+    std::unordered_map<std::string,int> station_to_index;
     std::vector<std::string> index_to_station;
 
-    std::map<std::string,int> line_to_index;
+    std::unordered_map<std::string,int> line_to_index;
     std::vector<std::string> index_to_line;
 
     std::vector<std::vector<Rail>> graph;
     Unionfind uf;
 
-    std::stack<Rail> route_Rail;
 
     RailwayNetwork();
 
@@ -40,8 +39,8 @@ struct RailwayNetwork{
     void station_plan_input(int &start_index,int &goal_index,int &plan);
 
 
-    void dijkstra(int &start_index,int &goal_index,double fare_ratio,double time_ratio);
+    std::stack<Rail> dijkstra(int start_index,int goal_index,int fare_ratio,int time_ratio);
 
     
-    void route_output(int &start_index,int &goal_index,int &plan);
+    void route_output(int &start_index,int &goal_index,int &plan,std::stack<Rail> &route_Rail);
 };
