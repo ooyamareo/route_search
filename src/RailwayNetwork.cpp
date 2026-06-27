@@ -3,7 +3,7 @@
 #include<iostream>
 #include<sstream>
 
-using std::cout;
+
 #include "RailwayNetwork.hpp"
 
 RailwayNetwork::RailwayNetwork():uf(0){}
@@ -47,10 +47,10 @@ void RailwayNetwork::read_connection_csv(){
         int current_station_index,next_station_index,line_index,fare,time;
 
 
-        std::vector<int*> address={&current_station_index,&next_station_index,&line_index,&fare,&time};
         for(int i = 0; i < 5 ; i++){
             getline(str_buf_stream,str_comma_buf,',');
             //std::cout <<str_comma_buf<<' ';
+            
             
             
             // iの値で分岐
@@ -67,7 +67,21 @@ void RailwayNetwork::read_connection_csv(){
                 }
 
                 //出発駅と到着駅のインデックスを保存
-                *address[i]=station_to_index[str_comma_buf];
+                switch (i)
+                {
+                case 0:
+                    current_station_index=station_to_index[str_comma_buf];
+                    break;
+                
+                case 1:
+                    next_station_index=station_to_index[str_comma_buf];
+                    break;
+                default:
+                    std::cout <<"read_connection_csvの分岐にバグがあります\n";
+                    abort();
+                    break;
+                }
+                
             }
             else if( i == 2){
                 
@@ -79,15 +93,28 @@ void RailwayNetwork::read_connection_csv(){
                 }std::string response;
 
                 //路線のインデックスを保存
-                *address[i]=line_to_index[str_comma_buf];
+                line_index=line_to_index[str_comma_buf];
 
 
             }
             else{
                
                 //運賃，または経由時間を保存
-                *address[i]=std::stoi(str_comma_buf);
-
+                
+                switch (i)
+                {
+                case 3:
+                    fare=std::stoi(str_comma_buf);
+                    break;
+                
+                case 4:
+                    time=std::stoi(str_comma_buf);
+                    break;
+                default:
+                    std::cout <<"read_connection_csvの分岐にバグがあります\n";
+                    abort();
+                    break;
+                }
             }
         }
         
@@ -172,6 +199,7 @@ void RailwayNetwork::station_plan_input(int &start_index,int &goal_index,int &pl
         }
 
         if(start_is_connected_to_goal==false)continue;
+
         //最短経路，最安賃金経路，最小乗り換え経路から選ぶ
         //入力ミスがあったらやり直しをする
         std::string cmd;
@@ -191,27 +219,18 @@ void RailwayNetwork::station_plan_input(int &start_index,int &goal_index,int &pl
         }
 
         plan=cmd.at(0)-'0';
-        
-        
             
         return;
 
+
     }
     
-    
-    
-
-    
-
-
-    
-    
-        
+            
 
 }
 
 //dijkstra()で得た経路を出力する関数
-void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan,std::stack<Rail> &route_Rail){
+void RailwayNetwork::route_output(const int start_index,const int goal_index,int &plan,std::stack<Rail> &route_Rail){
     
     
     std::cout <<"\n";
@@ -245,7 +264,7 @@ void RailwayNetwork::route_output(int &start_index,int &goal_index,int &plan,std
 
         //路線名
         response+="|\n|--"+index_to_line[rail.line_index]+"(";
-        rail.line_index=rail.line_index;
+        
 
         //運賃
         response+=std::to_string(rail.fare)+"円"+",";

@@ -39,8 +39,8 @@ struct RailwayNetwork{
     void station_plan_input(int &start_index,int &goal_index,int &plan);
 
 
-    std::stack<Rail> dijkstra(int start_index,int goal_index,int fare_ratio,int time_ratio);
+    std::stack<Rail> dijkstra(const int start_index,const int goal_index,int fare_ratio,int time_ratio);
 
     
-    void route_output(int &start_index,int &goal_index,int &plan,std::stack<Rail> &route_Rail);
+    void route_output(const int start_index,const int goal_index,int &plan,std::stack<Rail> &route_Rail);
 };

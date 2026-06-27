@@ -15,6 +15,7 @@ std::stack<Rail> RailwayNetwork::dijkstra(int start_index,int goal_index,
 
     std::vector<int> dist(N,INT_MAX/2);
 
+
     struct node{
         int vertex;
         int distance;
@@ -43,6 +44,9 @@ std::stack<Rail> RailwayNetwork::dijkstra(int start_index,int goal_index,
         int now_distance=pq.top().distance;
         
         pq.pop();
+
+        //goalまでたどり着いたらあとは探索不要
+        if(from_index==goal_index)break;
 
         if(dist[from_index]<now_distance)continue;
 
@@ -80,10 +84,14 @@ std::stack<Rail> RailwayNetwork::dijkstra(int start_index,int goal_index,
 
 
     while(route_station.top()!=start_index){
+
+        bool found =false;
         for(auto rail:graph[route_station.top()]){
 
             int pre_distance=fare_ratio*rail.fare+time_ratio*rail.time;
             if(dist[rail.to_index]+pre_distance==dist[route_station.top()]){
+
+                found =true;
                 route_station.push(rail.to_index);
 
                 //最短経路はstartからgoalで出力したいが，
@@ -101,8 +109,15 @@ std::stack<Rail> RailwayNetwork::dijkstra(int start_index,int goal_index,
                     rail.time+=next_rail.time;
                 }
                 route_Rail.push(rail);
+                
                 break;
             }
+            
+        }
+
+        if(!found){
+            std::cout <<"経路復元にバグがあります\n";
+            abort();
         }
 
     }

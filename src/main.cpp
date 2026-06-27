@@ -1,4 +1,5 @@
 #include<stack>
+#include<iostream>
 
 #include "global_val.hpp"
 #include "Unionfind.hpp"
@@ -40,6 +41,10 @@ int main(){
         
         case 1: //最短経路
             fare_ratio=0,time_ratio=1;
+            break;
+        default: //planが0,1以外のときはstation_plan_inputの関数内で強制終了しているはず
+            std::cout<<"station_plan_input内でplanの例外処理ができていない可能性がある"<<"\n";
+            abort();
         }
         
         std::stack<Rail> route_Rail=network.dijkstra(start_index,goal_index,fare_ratio,time_ratio);
